@@ -1,8 +1,9 @@
-from urllib.parse import uses_fragment
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth import get_user_model
+# from django.utils.text import slugify
+from pytils.translit import slugify
 
 
 User = get_user_model()
@@ -17,9 +18,13 @@ class Post(models.Model):
     )
     title = models.TextField(
         verbose_name='Заголовок',
-        help_text='Заголовок', 
+        help_text='Заголовок',
         max_length=100,
         unique=True
+    )
+    slug = models.SlugField(
+        blank=True,
+        null=True
     )
     description = models.TextField(
         verbose_name='Описание',
@@ -54,7 +59,7 @@ class Post(models.Model):
     status = models.CharField(
         max_length=15,
         choices=STATUS_CHOISE,
-        default=DRAFT        
+        default=DRAFT
     )
     image = models.ImageField(
         verbose_name='Картинка',
@@ -62,7 +67,11 @@ class Post(models.Model):
         blank=True
     )
 
-    
+    # почекать как будет отображаться self.id в урлах
+    def save(self, *args, **kwargs):
+        self.slug = slugify(f'{self.id}-{self.title}')
+        super().save(*args, **kwargs)
+
     class Meta:
         ordering = ['title', '-pub_date']
         verbose_name = 'пост'
@@ -71,8 +80,7 @@ class Post(models.Model):
     def __str__(self):
         return self.title and self.text[:settings.TEXT_ADMIN_SHOW]
 
-    
-    
+
 class Comment(models.Model):
     post = models.ForeignKey(
         Post,
@@ -88,48 +96,80 @@ class Comment(models.Model):
     author = models.ForeignKey(
         User,
         verbose_name='Автор комментария',
+        related_name='comments',
         on_delete=models.CASCADE,
-        related_name='comments'
+
     )
     created = models.DateTimeField(
         verbose_name='Дата создания',
         auto_now_add=True
     )
-    
+
     class Meta:
         verbose_name = 'комментарий'
         verbose_name_plural = 'комментарии'
-    
+
     def __str__(self):
         return self.author and self.text[:settings.TEXT_ADMIN_SHOW]
-        
 
 
 class CommentLikes(models.Model):
-    post = models.ForeignKey(
-        Post,
-        verbose_name='Лайк поста',
+    comment = models.ForeignKey(
+        Comment,
+        verbose_name='Лайк коммента',
         related_name='commentlikes',
         on_delete=models.CASCADE
     )
     like_by = models.ForeignKey(
         User,
-        verbose_name='Поставил лайк',
+        verbose_name='Автор лайка коммента',
+        related_name='commentlikes',
         on_delete=models.SET_NULL,
         null=True
     )
-    like = models.IntegerField(
+    like = models.BooleanField(
         verbose_name='Лайк',
     )
     created = models.DateTimeField(
         verbose_name='Время создания',
         auto_now_add=True
     )
-    
-    class Meta:
-        verbose_name = 'Лайк'
-        verbose_name_plural = 'Лайки'    
 
+    class Meta:
+        verbose_name = 'Лайк комментария'
+        verbose_name_plural = 'Лайки комментариев'
+
+    def __str__(self):
+        return str(self.like_by)
+
+
+class PostLikes(models.Model):
+    post = models.ForeignKey(
+        Post,
+        verbose_name='Лайк поста',
+        related_name='postlikes',
+        on_delete=models.CASCADE
+    )
+    like_by = models.ForeignKey(
+        User,
+        verbose_name='Автор лайка поста',
+        related_name='postlikes',
+        on_delete=models.CASCADE
+    )
+    like = models.BooleanField(
+        verbose_name='Лайк'
+    )
+    created = models.DateTimeField(
+        verbose_name='Время лайка',
+        auto_now_add=True
+    )
+
+    class Meta:
+        verbose_name = 'Лайк поста'
+        verbose_name_plural = 'Лайки постов'
+
+    def __str__(self):
+        return str(self.like_by)
 
 
 class Follow(models.Model):
