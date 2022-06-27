@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 # from django.utils.text import slugify
 from pytils.translit import slugify
 
+from taggit.managers import TaggableManager
 
 User = get_user_model()
 
@@ -16,6 +17,7 @@ class Post(models.Model):
         (DRAFT, 'Draft'),
         (PUBLISHED, 'Published'),
     )
+    tags = TaggableManager()
     title = models.TextField(
         verbose_name='Заголовок',
         help_text='Заголовок',
