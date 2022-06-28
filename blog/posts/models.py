@@ -10,6 +10,11 @@ from taggit.managers import TaggableManager
 User = get_user_model()
 
 
+class PublishedManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(status='published')
+
+
 class Post(models.Model):
     DRAFT = 'draft'
     PUBLISHED = 'published'
@@ -68,10 +73,11 @@ class Post(models.Model):
         upload_to='posts/',
         blank=True
     )
+    objects = models.Manager()
+    published = PublishedManager()
 
-    # почекать как будет отображаться self.id в урлах
     def save(self, *args, **kwargs):
-        self.slug = slugify(f'{self.id}-{self.title}')
+        self.slug = slugify(f'{self.title}')
         super().save(*args, **kwargs)
 
     class Meta:
