@@ -7,6 +7,7 @@ from pytils.translit import slugify
 
 from taggit.managers import TaggableManager
 
+
 User = get_user_model()
 
 
