@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import get_user_model
 from .models import Post
-from .services import index_get_posts, post_detail_get_post
+from .services import index_get_posts, get_post_or_404
 from .forms import PostForm
 
 User = get_user_model()
@@ -14,21 +14,20 @@ def index(request):
     return render(request, 'posts/index.html', context)
 
 
-def post_detail(request, slug, post_id):
+def post_detail(request, post_id, slug):
     context = {
-        'post': post_detail_get_post(post_id, slug)
+        'post': get_post_or_404(post_id, slug)
     }
     return render(request, 'posts/post_detail.html', context)
 
 
-def post_edit(request, slug, post_id):
-    post = get_object_or_404(Post, slug=slug, id=post_id)
-    if post.author != request.user:
+def post_edit(request, post_id, slug):
+    if get_post_or_404(post_id, slug).author != request.user:
         return redirect('posts:post_detail', post_id, slug)
     form = PostForm(
         request.POST or None,
         files=request.FILES or None,
-        instance=post
+        instance=get_post_or_404(post_id, slug)
     )
     if form.is_valid():
         form.save()

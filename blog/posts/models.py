@@ -30,10 +30,6 @@ class Post(models.Model):
         max_length=100,
         unique=True
     )
-    slug = models.SlugField(
-        blank=True,
-        null=True
-    )
     description = models.TextField(
         verbose_name='Описание',
         help_text='Описание',
@@ -72,6 +68,15 @@ class Post(models.Model):
     image = models.ImageField(
         verbose_name='Картинка',
         upload_to='posts/',
+        blank=True
+    )
+    slug = models.SlugField(
+        blank=True,
+        null=True
+    )
+    liked = models.ManyToManyField(
+        User,
+        default=None,
         blank=True
     )
     objects = models.Manager()
@@ -113,6 +118,11 @@ class Comment(models.Model):
         verbose_name='Дата создания',
         auto_now_add=True
     )
+    liked = models.ManyToManyField(
+        User,
+        default=None,
+        blank=True
+    )
 
     class Meta:
         verbose_name = 'комментарий'
@@ -120,6 +130,14 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.author and self.text[:settings.TEXT_ADMIN_SHOW]
+
+
+LIKE = 'Like'
+DISLIKE = 'Dislike'
+LIKE_CHOICES = (
+    (LIKE, 'Like'),
+    (DISLIKE, 'Dislike'),
+)
 
 
 class CommentLikes(models.Model):
@@ -136,12 +154,11 @@ class CommentLikes(models.Model):
         on_delete=models.SET_NULL,
         null=True
     )
-    like = models.BooleanField(
+    value = models.CharField(
         verbose_name='Лайк',
-    )
-    created = models.DateTimeField(
-        verbose_name='Время создания',
-        auto_now_add=True
+        max_length=10,
+        choices=LIKE_CHOICES,
+        default=LIKE,
     )
 
     class Meta:
@@ -165,12 +182,11 @@ class PostLikes(models.Model):
         related_name='postlikes',
         on_delete=models.CASCADE
     )
-    like = models.BooleanField(
-        verbose_name='Лайк'
-    )
-    created = models.DateTimeField(
-        verbose_name='Время лайка',
-        auto_now_add=True
+    value = models.CharField(
+        verbose_name='Лайк',
+        max_length=10,
+        choices=LIKE_CHOICES,
+        default=LIKE
     )
 
     class Meta:
@@ -178,7 +194,7 @@ class PostLikes(models.Model):
         verbose_name_plural = 'Лайки постов'
 
     def __str__(self):
-        return str(self.like_by)
+        return str(f'{self.like_by.first_name} лайкнул {self.post}')
 
 
 class Follow(models.Model):

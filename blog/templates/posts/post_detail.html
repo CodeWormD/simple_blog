@@ -5,8 +5,11 @@
     <div class="col-9">
       <div class="card mb-3 shadow-sm">
         <div class="card-header">
-          {{ post.author }},
-          <small class="text-muted"> {{ post.pub_date }} </small>
+          <div class="flex-row" >
+              <a href="#">{{ post.author.first_name }}</a>,
+              {{ post.pub_date|date:"SHORT_DATE_FORMAT" }} {{ post.pub_date|time:"H:i" }}
+              <a href="{% url 'posts:post_edit' post.id post.slug %}"> Редактировать</a>              
+          </div>  
         </div>
         <div class="card-body">
           <h2 class="card-title">

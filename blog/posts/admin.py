@@ -24,7 +24,6 @@ class Comment(admin.ModelAdmin):
     list_display = (
         'post',
         'author'
-        
     )
 
 
@@ -33,7 +32,7 @@ class CommentLikes(admin.ModelAdmin):
     list_display = (
         'comment',
         'like_by',
-        'created'
+        'value'
     )
 
 
@@ -42,10 +41,10 @@ class PostLikes(admin.ModelAdmin):
     list_display = (
         'post',
         'like_by',
-        'created'
+        'value'
     )
-    
-    
+
+
 @admin.register(Follow)
 class Follow(admin.ModelAdmin):
     list_display = (

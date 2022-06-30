@@ -3,8 +3,8 @@
   <div class="col-9">
     <div class="card mb-3 shadow-sm">
       <div class="card-header">
-        {{ post.author }},
-        <small class="text-muted"> {{ post.pub_date }} </small>
+        <a href="#">{{ post.author.first_name }}</a>,
+        {{ post.pub_date|date:"SHORT_DATE_FORMAT" }} {{ post.pub_date|time:"H:i" }}
       </div>
       <a href="{% url 'posts:post_detail' post.id post.slug %}" style='text-decoration: none; color:#101010'>  
         <div class="card-body">
@@ -21,8 +21,8 @@
       </a>
       <div class="card-footer">
         <div class="d-flex justify-content-between align-items-center" >
-            <small> кол-во комментов - 150 </small>
-            <small > кол-во лайков - 50 </small>
+            <small ><a href="{% url 'posts:post_detail' post.id post.slug %}">{{ post.comments.count}}</a></small>
+            <small ><a href="{% url 'posts:post_detail' post.id post.slug %}">{{ post.postlikes.count}}</a></small>
         </div>
       </div>  
     </div>  
