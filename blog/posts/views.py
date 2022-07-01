@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import get_user_model
-from .models import Post
-from .services import index_get_posts, get_post_or_404
+from .models import Post, PostLike, PostDisLike
+from .services import index_get_posts, get_post_or_404, post_like_get, post_dislike_get
 from .forms import PostForm
 
 User = get_user_model()
@@ -51,4 +51,14 @@ def post_create(request):
     post = form.save(commit=False)
     post.author = request.user
     post.save()
+    return redirect('posts:index')
+
+
+def post_like(request, post_id, slug):
+    post_like_get(request, post_id, slug)
+    return redirect('posts:index')
+
+
+def post_dislike(request, post_id, slug):
+    post_dislike_get(request, post_id, slug)
     return redirect('posts:index')

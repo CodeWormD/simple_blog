@@ -1,5 +1,5 @@
 {% load thumbnail %}
-<div class="row justify-content-md-center">
+<div class="row d-flex justify-content-center">
   <div class="col-9">
     <div class="card mb-3 shadow-sm">
       <div class="card-header">
@@ -20,10 +20,20 @@
         </div>
       </a>
       <div class="card-footer">
-        <div class="d-flex justify-content-between align-items-center" >
-            <small ><a href="{% url 'posts:post_detail' post.id post.slug %}">{{ post.comments.count}}</a></small>
-            <small ><a href="{% url 'posts:post_detail' post.id post.slug %}">{{ post.postlikes.count}}</a></small>
-        </div>
+            <div class="d-flex justify-content-end">
+                <small class="d-flex justify-content-end" >
+                <a class="btn btn-sm " style="text-decoration: none; color:red; background-color: white; margin-right: 5px;" href="{% url 'posts:post_dislike' post.id post.slug %}">
+                    <i class="fa fa-arrow-down fa-lg"></i> 
+                    -{{ post.postdislikes.count}} 
+                </a>
+                </small>
+                <small class="d-flex justify-content-end">
+                <a class="btn btn-sm " style="text-decoration: none; color:green; background-color: white;" href="{% url 'posts:post_like' post.id post.slug %}">
+                    <spawn >+{{ post.postlikes.count}} </spawn>
+                    <i class="fa fa-arrow-up fa-lg"></i> 
+                </a>
+                </small>
+            </div>        
       </div>  
     </div>  
   </div>

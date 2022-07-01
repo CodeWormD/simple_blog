@@ -74,11 +74,6 @@ class Post(models.Model):
         blank=True,
         null=True
     )
-    liked = models.ManyToManyField(
-        User,
-        default=None,
-        blank=True
-    )
     objects = models.Manager()
     published = PublishedManager()
 
@@ -140,7 +135,7 @@ LIKE_CHOICES = (
 )
 
 
-class CommentLikes(models.Model):
+class CommentLike(models.Model):
     comment = models.ForeignKey(
         Comment,
         verbose_name='Лайк коммента',
@@ -169,7 +164,7 @@ class CommentLikes(models.Model):
         return str(self.like_by)
 
 
-class PostLikes(models.Model):
+class PostLike(models.Model):
     post = models.ForeignKey(
         Post,
         verbose_name='Лайк поста',
@@ -195,6 +190,34 @@ class PostLikes(models.Model):
 
     def __str__(self):
         return str(f'{self.like_by.first_name} лайкнул {self.post}')
+
+
+class PostDisLike(models.Model):
+    post = models.ForeignKey(
+        Post,
+        verbose_name='Дизлайк поста',
+        related_name='postdislikes',
+        on_delete=models.CASCADE
+    )
+    dislike_by = models.ForeignKey(
+        User,
+        verbose_name='Автор дизлайка поста',
+        related_name='postdislikes',
+        on_delete=models.CASCADE
+    )
+    value = models.CharField(
+        verbose_name='Дизлайк',
+        max_length=10,
+        choices=LIKE_CHOICES,
+        default=DISLIKE
+    )
+
+    class Meta:
+        verbose_name = 'Дизлайк поста'
+        verbose_name_plural = 'Дизлайки постов'
+
+    def __str__(self):
+        return str(f'{self.dislike_by.first_name} Дизлайкнул {self.post}')
 
 
 class Follow(models.Model):
