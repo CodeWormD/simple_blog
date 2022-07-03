@@ -1,7 +1,8 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, redirect  # get_object_or_404,
 from django.contrib.auth import get_user_model
-from .models import Post, PostLike, PostDisLike
-from .services import index_get_posts, get_post_or_404, post_like_get, post_dislike_get
+# from .models import Post, PostLike, PostDisLike
+from .services import (
+    index_get_posts, get_post_or_404, post_like_get, post_dislike_get)
 from .forms import PostForm
 
 User = get_user_model()
