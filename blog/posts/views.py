@@ -1,9 +1,9 @@
-from django.shortcuts import render, redirect  # get_object_or_404,
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model
-# from .models import Post, PostLike, PostDisLike
+from .models import Post, PostLike, PostDisLike
 from .services import (
     index_get_posts, get_post_or_404, post_like_get, post_dislike_get)
-from .forms import PostForm
+from .forms import PostForm, CommentForm
 
 User = get_user_model()
 
@@ -16,8 +16,10 @@ def index(request):
 
 
 def post_detail(request, post_id, slug):
+    form = CommentForm(request.POST or None)
     context = {
-        'post': get_post_or_404(post_id, slug)
+        'post': get_post_or_404(post_id, slug),
+        'form': form
     }
     return render(request, 'posts/post_detail.html', context)
 
@@ -63,3 +65,18 @@ def post_like(request, post_id, slug):
 def post_dislike(request, post_id, slug):
     post_dislike_get(request, post_id, slug)
     return redirect('posts:index')
+
+
+def post_comment(request, post_id, slug):
+    post = get_post_or_404(post_id, slug)
+    form = CommentForm(
+        request.POST or None
+    )
+    if form.is_valid():
+        comment = form.save(commit=False)
+        comment.author = request.user
+        comment.post = post
+        comment.save()
+    else:
+        return redirect('posts:index')
+    return redirect('posts:post_detail', post_id, slug)

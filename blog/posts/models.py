@@ -99,8 +99,7 @@ class Comment(models.Model):
     )
     text = models.TextField(
         verbose_name='Текст комментария',
-        help_text='Текст комментария',
-        max_length=100
+        help_text='Текст комментария'
     )
     author = models.ForeignKey(
         User,
