@@ -15,5 +15,7 @@ urlpatterns = [
     path('post/<int:post_id>-<slug:slug>/dislike/',
          views.post_dislike, name='post_dislike'),
     path('post/<int:post_id>-<slug:slug>/comment/',
-         views.post_comment, name='post_comment')
+         views.post_comment, name='post_comment'),
+    path('post/<int:post_id>-<slug:slug>/comment/<int:comment_id>/like/',
+         views.comment_like, name='comment_like')
 ]

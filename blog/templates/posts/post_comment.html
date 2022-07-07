@@ -1,3 +1,4 @@
+{% load static %}
 {% load user_filters %}
 
 {% if user.is_authenticated %}
@@ -36,16 +37,17 @@
         </div>
         <div class="d-flex justify-content-start mt-2">
             <small >
-            <a class="btn btn-sm " style="text-decoration: none; color:red; background-color: white; margin-right: 5px;" href="#">
+              <a class="btn btn-sm " href="#" style="text-decoration: none; color:red; background-color: white; margin-right: 5px;">
                 <i class="fa fa-arrow-down fa-lg"></i> 
                 -0{{ post.comment.count}} 
-            </a>
+              </a>
             </small>
             <small>
-            <a class="btn btn-sm " style="text-decoration: none; color:green; background-color: white;" href="#">
-                <spawn >+0{{ post.comment.count}} </spawn>
+              <a class="btn btn-sm" href="{% url 'posts:comment_like' post.id post.slug comment.id %}" style="text-decoration: none; color:green; background-color: white;">
+                <spawn >+{{ comment.commentlikes.count}} </spawn>
                 <i class="fa fa-arrow-up fa-lg"></i> 
-            </a>
+              </a>
+
             </small>
         </div> 
       </div>

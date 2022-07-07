@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model
-from .models import Post, PostLike, PostDisLike
+from .models import Comment, CommentLike, CommentDisLike
+from django.http import JsonResponse, HttpResponse
 from .services import (
     index_get_posts, get_post_or_404, post_like_get, post_dislike_get)
 from .forms import PostForm, CommentForm
@@ -77,6 +78,34 @@ def post_comment(request, post_id, slug):
         comment.author = request.user
         comment.post = post
         comment.save()
+    else:
+        return redirect('posts:index')
+    return redirect('posts:post_detail', post_id, slug)
+
+
+def comment_like(request, post_id, slug, comment_id):
+    if request.user.is_authenticated:
+        comment = get_object_or_404(Comment, id=comment_id)
+        com_like = CommentLike.objects.filter(
+            like_by=request.user,
+            comment=comment)
+        com_dislike = CommentDisLike.objects.filter(
+            dislike_by=request.user,
+            comment=comment)
+        if com_like.exists():
+            com_like.delete()
+        elif com_dislike.exists() or com_like.exists() is False:
+            com_dislike.delete()
+            like, created = CommentLike.objects.get_or_create(
+                like_by=request.user,
+                comment=comment
+            )
+            if not created:
+                if like.value == 'Like':
+                    like.value == 'Dislike'
+                else:
+                    like.value == 'Like'
+            like.save()
     else:
         return redirect('posts:index')
     return redirect('posts:post_detail', post_id, slug)

@@ -1,7 +1,10 @@
 from django.contrib import admin
 
 from .models import (
-    Comment, Post, CommentLike, Follow, PostLike, PostDisLike)
+    Comment, Post,
+    CommentLike, Follow, PostLike,
+    PostDisLike, CommentDisLike
+    )
 
 
 @admin.register(Post)
@@ -16,7 +19,7 @@ class PostAdmin(admin.ModelAdmin):
         'status'
     )
     search_fields = ('title',)
-    list_filter = ('pub_date', 'title')
+    list_filter = ('pub_date', 'title', 'id')
     empty_value_display = '-пусто-'
 
 
@@ -33,6 +36,15 @@ class CommentLikes(admin.ModelAdmin):
     list_display = (
         'comment',
         'like_by',
+        'value'
+    )
+
+
+@admin.register(CommentDisLike)
+class CommentDisLikes(admin.ModelAdmin):
+    list_display = (
+        'comment',
+        'dislike_by',
         'value'
     )
 

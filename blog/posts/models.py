@@ -82,7 +82,7 @@ class Post(models.Model):
         super().save(*args, **kwargs)
 
     class Meta:
-        ordering = ['title', '-pub_date']
+        ordering = ['title', '-pub_date', 'pk']
         verbose_name = 'пост'
         verbose_name_plural = 'посты'
 
@@ -114,7 +114,7 @@ class Comment(models.Model):
     )
     liked = models.ManyToManyField(
         User,
-        default=None,
+        related_name='comments_likes',
         blank=True
     )
 
@@ -123,7 +123,7 @@ class Comment(models.Model):
         verbose_name_plural = 'комментарии'
 
     def __str__(self):
-        return self.author and self.text[:settings.TEXT_ADMIN_SHOW]
+        return self.author.username and self.text[:settings.TEXT_ADMIN_SHOW]
 
 
 LIKE = 'Like'
@@ -163,6 +163,35 @@ class CommentLike(models.Model):
         return str(self.like_by)
 
 
+class CommentDisLike(models.Model):
+    comment = models.ForeignKey(
+        Comment,
+        verbose_name='Дизайк коммента',
+        related_name='commentdislikes',
+        on_delete=models.CASCADE
+    )
+    dislike_by = models.ForeignKey(
+        User,
+        verbose_name='Автор дизлайка коммента',
+        related_name='commentdislikes',
+        on_delete=models.SET_NULL,
+        null=True
+    )
+    value = models.CharField(
+        verbose_name='Дизлайк',
+        max_length=10,
+        choices=LIKE_CHOICES,
+        default=DISLIKE,
+    )
+
+    class Meta:
+        verbose_name = 'Дизлайк комментария'
+        verbose_name_plural = 'Дизлайк комментариев'
+
+    def __str__(self):
+        return str(self.dislike_by)
+
+
 class PostLike(models.Model):
     post = models.ForeignKey(
         Post,
@@ -188,7 +217,7 @@ class PostLike(models.Model):
         verbose_name_plural = 'Лайки постов'
 
     def __str__(self):
-        return str(f'{self.like_by.first_name} лайкнул {self.post}')
+        return str(f'{self.like_by.first_name} лайкнул {self.post.title}')
 
 
 class PostDisLike(models.Model):
@@ -216,7 +245,7 @@ class PostDisLike(models.Model):
         verbose_name_plural = 'Дизлайки постов'
 
     def __str__(self):
-        return str(f'{self.dislike_by.first_name} Дизлайкнул {self.post}')
+        return str(f'{self.dislike_by.first_name} дизлайкнул {self.post}')
 
 
 class Follow(models.Model):
