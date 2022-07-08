@@ -1,4 +1,5 @@
-from .models import Post, PostLike, PostDisLike
+from .models import (Post, PostLike, PostDisLike,
+                     Comment, CommentLike, CommentDisLike)
 from django.shortcuts import get_object_or_404
 
 
@@ -58,4 +59,54 @@ def post_dislike_get(request, post_id, slug):
                 dislike.value = 'Like'
             else:
                 dislike.value = 'Dislike'
+        return dislike.save()
+
+
+def comment_like_get(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+    com_like = CommentLike.objects.filter(
+        like_by=request.user,
+        comment=comment)
+    com_dislike = CommentDisLike.objects.filter(
+        dislike_by=request.user,
+        comment=comment)
+    if com_like.exists():
+        com_like.delete()
+    elif com_dislike.exists() or com_like.exists() is False:
+        com_dislike.delete()
+        like, created = CommentLike.objects.get_or_create(
+            like_by=request.user,
+            comment=comment
+        )
+        if not created:
+            if like.value == 'Like':
+                like.value == 'Dislike'
+            else:
+                like.value == 'Like'
+        return like.save()
+
+
+def comment_dislike_get(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+    com_like = CommentLike.objects.filter(
+        like_by=request.user,
+        comment=comment
+    )
+    com_dislike = CommentDisLike.objects.filter(
+        dislike_by=request.user,
+        comment=comment
+    )
+    if com_dislike.exists():
+        com_dislike.delete()
+    elif com_like.exists() or com_dislike.exists() is False:
+        com_like.delete()
+        dislike, created = CommentDisLike.objects.get_or_create(
+            dislike_by=request.user,
+            comment=comment
+        )
+        if not created:
+            if dislike.values == 'Dislike':
+                dislike.values = 'Like'
+            else:
+                dislike.values = 'Dislike'
         return dislike.save()
